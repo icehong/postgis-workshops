@@ -16,17 +16,21 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python 3.9
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.9
     - name: Install dependencies
       run: |
-        pip install -U sphinx sphinx-rtd-theme
-    - name: Release doc
+        sudo apt-get install python3-sphinx latexmk texlive-latex-extra
+        pip install sphinx-rtd-theme
+    - name: build doc
       run: |
         # stop the build if there are Python syntax errors or undefined names
         cd postgis-intro/sources/en/
         make html
         make latex
-
+        cd  ../../doc/en/.build/latex
+        make all-pdf
+        cd ../../../../../
+    - name: Upload pdf
+      uses: actions/upload-artifact@v2
+      with:
+        path: postgis-intro/doc/en/.build/latex/*.pdf
+        if-no-files-found: warn       
